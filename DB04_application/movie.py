@@ -43,10 +43,6 @@ if __name__ == "__main__":
     group_info.add_argument('-ad', dest='is_adult', type=bool, help='is_adult of movie entity')
     group_info.add_argument('-r', dest='rating', type=int, help='m_rating of movie entity')
     
-    
-
-
-    
     args = parser.parse_args()
     main(args)
     print("Running Time: ", end="")
