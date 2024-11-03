@@ -149,8 +149,6 @@ def main(args):
             update_customer(args.id, "password", args.password)
         elif args.phone:
             update_customer(args.id, "phone", args.phone)
-        else:
-            pass # do nothing
 
     elif args.command == "delete":
         #. TODO
