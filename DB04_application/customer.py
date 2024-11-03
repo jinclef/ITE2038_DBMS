@@ -199,6 +199,7 @@ if __name__ == "__main__":
     #[1-4]delete
     parser_delete = subparsers.add_parser('delete', help='Delete customer data with associated data')
     # TODO
+    customer_delete = parser_delete.add_argument('-i', dest='id', type=int, help='c_id of customer entity')
     
     args = parser.parse_args()
     main(args)
