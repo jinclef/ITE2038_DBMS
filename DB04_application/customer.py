@@ -143,6 +143,14 @@ def main(args):
 
     elif args.command == "update":
         # TODO
+        if args.email:
+            update_customer(args.id, "email", args.email)
+        elif args.password:
+            update_customer(args.id, "password", args.password)
+        elif args.phone:
+            update_customer(args.id, "phone", args.phone)
+        else:
+            pass # do nothing
 
     elif args.command == "delete":
         # TODO
@@ -182,6 +190,11 @@ if __name__ == "__main__":
     #[1-3]update
     parser_update = subparsers.add_parser('update', help='Update one of customer data')
     # TODO
+    customer_update = parser_update.add_mutually_exclusive_group(required=True) # 근데 이게 뭔데
+    customer_update.add_argument('-i', dest='id', type=int, help='c_id of customer entity')
+    customer_update.add_argument('-m', dest='email', type=str, help='c_email of customer entity')
+    customer_update.add_argument('-p', dest='password', type=str, help='c_password of customer entity')
+    customer_update.add_argument('-ph', dest='phone', type=str, help='c_phone of customer entity')
 
     #[1-4]delete
     parser_delete = subparsers.add_parser('delete', help='Delete customer data with associated data')
