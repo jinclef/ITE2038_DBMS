@@ -11,8 +11,26 @@ def display_info(search_type, search_value):
     # TODO
 
 def main(args):
-    # TODO
-
+    #. TODO
+    if args.command == "info":
+        if args.all:
+            display_info('all', args.all)
+        elif args.id:
+            display_info('id', args.id)
+        elif args.name:
+            display_info('name', args.name)
+        elif args.genre:
+            display_info('genre', args.genre)
+        elif args.start_year:
+            display_info('start_year', args.start_year)
+        elif args.end_year:
+            display_info('end_year', args.end_year)
+        elif args.is_adult:
+            display_info('is_adult', args.is_adult)
+        elif args.rating:
+            display_info('rating', args.rating)
+        else:
+            print("Error: query command error.")
 
 if __name__ == "__main__":
     #
