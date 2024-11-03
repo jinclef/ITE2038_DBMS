@@ -9,6 +9,7 @@ from helpers.utils import make_csv
 
 def display_info(search_type, search_value):
     # TODO
+    pass
 
 def main(args):
     #. TODO
