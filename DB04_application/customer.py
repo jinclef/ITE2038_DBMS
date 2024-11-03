@@ -146,6 +146,8 @@ def main(args):
 
     elif args.command == "delete":
         # TODO
+        delete_customer(args.id)
+
     else :
         print("Error: query command error.")
 
@@ -163,8 +165,7 @@ if __name__ == "__main__":
     3. update -i [c_id] [-m(e-mail) / -p(password) / -ph(phone)] [new_value]
     4. delete -i [c_id]
     """, formatter_class=argparse.RawTextHelpFormatter)
-    subparsers = parser.add_subparsers(dest='command', 
-        help='select one of query types [info, insert, update, delete]')
+    subparsers = parser.add_subparsers(dest='command', help='select one of query types [info, insert, update, delete]')
 
     #[1-1]info
     parser_info = subparsers.add_parser('info', help='Display target customers info')
