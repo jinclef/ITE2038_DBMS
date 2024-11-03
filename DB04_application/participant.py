@@ -29,8 +29,6 @@ def main(args):
     else :
         print("Error: query command error.")
 
-    pass
-
 
 if __name__ == "__main__":
     #
@@ -49,7 +47,11 @@ if __name__ == "__main__":
     #info
     parser_info = subparsers.add_parser('info', help='Display target participant info')
     group_info = parser_info.add_mutually_exclusive_group(required=True)
-    # TODO
+    #. TODO
+    group_info.add_argument('-a', dest='all', type=str, help='display rows with top [value]')
+    group_info.add_argument('-i', dest='id', type=int, help='p_id of participant entity')
+    group_info.add_argument('-n', dest='name', type=str, help='p_name of participant entity')
+    group_info.add_argument('-pr', dest='profession', type=str, help='ocu_name of participant entity')
 
     args = parser.parse_args()
     main(args)
