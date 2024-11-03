@@ -188,7 +188,7 @@ if __name__ == "__main__":
     parser_insert = subparsers.add_parser('insert', help='Insert new customer data')
     #. TODO
     customer_insert = parser_insert.add_mutually_exclusive_group(required=True)
-    customer_insert = parser_insert.add_argument('-g', dest='genre', type=str, help='genre which customer prefer')
+    customer_insert = parser_insert.add_argument('-g', dest='genre', type=tuple, help='genre which customer prefer')
 
     customer_insert = parser_insert.add_argument('c_id', type=int, help='c_id of customer entity to be inserted')
     customer_insert = parser_insert.add_argument('c_name', type=str, help='c_name of customer entity to be inserted')
