@@ -30,7 +30,9 @@ if __name__ == "__main__":
     #info
     parser_info = subparsers.add_parser('info', help='Display participant associated to genre info')
     group_info = parser_info.add_mutually_exclusive_group(required=True)
-    # TODO
+    #. TODO
+    group_info.add_argument('-a', dest='all', type=str, help='display rows with top [value]')
+    group_info.add_argument('-o', dest='one', type=str, help='display single row with m_id [value]')
 
     args = parser.parse_args()
     main(args)
