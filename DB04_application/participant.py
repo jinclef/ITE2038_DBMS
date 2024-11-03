@@ -10,7 +10,7 @@ from helpers.utils import is_valid_pro
 
 def display_info(search_type, search_value):
     # TODO
-
+    pass
 
 def main(args):
     if args.command == "info":

@@ -116,12 +116,15 @@ def display_info(search_type, search_value):
 
 def insert_customer(id, name, email, pwd, gender, phone, genres) :
     # TODO
+    pass
 
 def update_customer(id, target, value) :
     # TODO
+    pass
 
 def delete_customer(id) :
     # TODO
+    pass
 
 def main(args):
     if args.command == "info":
