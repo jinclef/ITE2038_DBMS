@@ -32,7 +32,18 @@ if __name__ == "__main__":
     #info
     parser_info = subparsers.add_parser('info', help='Display target movie info')
     group_info = parser_info.add_mutually_exclusive_group(required=True)
-    # TODO
+    #. TODO
+    group_info.add_argument('-a', dest='all', type=str, help='display rows with top [value]')
+    group_info.add_argument('-i', dest='id', type=int, help='m_id of movie entity')
+    group_info.add_argument('-n', dest='name', type=str, help='m_name of movie entity')
+    group_info.add_argument('-g', dest='genre', type=str, help='genre which movie classified')
+
+    group_info.add_argument('-sy', dest='start_year', type=str, help='start_year of movie entity')
+    group_info.add_argument('-ey', dest='end_year', type=str, help='end_year of movie entity')
+    group_info.add_argument('-ad', dest='is_adult', type=bool, help='is_adult of movie entity')
+    group_info.add_argument('-r', dest='rating', type=int, help='m_rating of movie entity')
+    
+    
 
 
     
