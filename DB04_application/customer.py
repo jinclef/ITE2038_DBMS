@@ -186,6 +186,7 @@ if __name__ == "__main__":
     #[1-2]insert
     parser_insert = subparsers.add_parser('insert', help='Insert new customer data')
     # TODO
+    customer_insert = parser_insert.add_argument('-g', dest='genre', type=str, help='genre which customer prefer')
     
     #[1-3]update
     parser_update = subparsers.add_parser('update', help='Update one of customer data')
