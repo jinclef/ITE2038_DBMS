@@ -119,8 +119,20 @@ def insert_customer(id, name, email, pwd, gender, phone, genres) :
     pass
 
 def update_customer(id, target, value) :
-    # TODO
-    pass
+    sql = """
+    UPDATE customer SET {target} = %(value)s WHERE c_id = %(id)s;
+    """.format(target=target)
+
+    try:
+        cur = conn.cursor()
+        cur.execute("SET search_path to s_2020")
+        cur.execute(sql, {"value": value, "id": id})
+        conn.commit()
+        print("Updated successfully.")
+    except Exception as err:
+        print(err)
+    finally:
+        cur.close()
 
 def delete_customer(id) :
     # TODO
