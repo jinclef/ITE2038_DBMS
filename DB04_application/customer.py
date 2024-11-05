@@ -119,6 +119,7 @@ def insert_customer(id, name, email, pwd, gender, phone, genres) :
     pass
 
 def update_customer(id, target, value) :
+    #. TODO
     sql = """
     UPDATE customer SET {target} = %(value)s WHERE c_id = %(id)s;
     """.format(target=target)
@@ -135,6 +136,7 @@ def update_customer(id, target, value) :
         cur.close()
 
 def delete_customer(id) :
+    #. TODO
     sql = """
     DELETE FROM customer WHERE c_id = %(id)s;
     """
