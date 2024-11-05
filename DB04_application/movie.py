@@ -8,8 +8,151 @@ from helpers.utils import print_command_to_file
 from helpers.utils import make_csv
 
 def display_info(search_type, search_value):
-    # TODO
-    pass
+    #. TODO
+    try:
+        cur = conn.cursor()
+        
+        cur.execute("SET search_path to s_2021006317")
+
+        if search_type == 'id' :
+            sql = """
+            SELECT 
+            m_id, 
+            m_name, 
+            m_genre, 
+            m_start_year, 
+            m_end_year, 
+            is_adult, 
+            m_rating
+            FROM movie
+            WHERE m_id = %(id)s
+            ORDER BY m_id ASC;
+            """
+            cur.execute(sql, {"id": search_value})
+
+        elif search_type == 'name' :
+            sql = """
+            SELECT
+            m_id, 
+            m_name, 
+            m_genre, 
+            m_start_year, 
+            m_end_year, 
+            is_adult, 
+            m_rating
+            FROM movie
+            WHERE m_name ILIKE %(name)s
+            ORDER BY m_id ASC;
+            """
+            cur.execute(sql, {"name": search_value})
+
+        elif search_type == 'genre' :
+            sql = """
+            SELECT 
+                m_id, 
+                m_name, 
+                m_genre, 
+                m_start_year, 
+                m_end_year, 
+                is_adult, 
+                m_rating
+            FROM movie
+            WHERE m_genre ILIKE %(genre)s
+            ORDER BY m_id ASC;
+            """
+            cur.execute(sql, {"genre": search_value})
+
+        elif search_type == 'all' :
+            sql = """
+            SELECT 
+                m_id, 
+                m_name, 
+                m_genre, 
+                m_start_year, 
+                m_end_year, 
+                is_adult, 
+                m_rating
+            FROM movie
+            ORDER BY m_id ASC
+            LIMIT %(all)s;
+            """
+            cur.execute(sql, {"all": search_value})
+
+        elif search_type == 'start_year' :
+            sql = """
+            SELECT 
+                m_id, 
+                m_name, 
+                m_genre, 
+                m_start_year, 
+                m_end_year, 
+                is_adult, 
+                m_rating
+            FROM movie
+            WHERE m_start_year = %(start_year)s
+            ORDER BY m_id ASC;
+            """
+            cur.execute(sql, {"start_year": search_value})
+
+        elif search_type == 'end_year' :
+            sql = """
+            SELECT 
+                m_id, 
+                m_name, 
+                m_genre, 
+                m_start_year, 
+                m_end_year,
+                is_adult,
+                m_rating
+            FROM movie
+            WHERE m_end_year = %(end_year)s
+            ORDER BY m_id ASC;
+            """
+            cur.execute(sql, {"end_year": search_value})
+
+        elif search_type == 'is_adult' :
+            sql = """
+            SELECT 
+                m_id, 
+                m_name, 
+                m_genre, 
+                m_start_year, 
+                m_end_year,
+                is_adult,
+                m_rating
+            FROM movie
+            WHERE is_adult = %(is_adult)s
+            ORDER BY m_id ASC;
+            """
+            cur.execute(sql, {"is_adult": search_value})
+
+        elif search_type == 'rating' :
+            sql = """
+            SELECT 
+                m_id, 
+                m_name, 
+                m_genre, 
+                m_start_year, 
+                m_end_year,
+                is_adult,
+                m_rating
+            FROM movie
+            WHERE m_rating = %(rating)s
+            ORDER BY m_id ASC;
+            """
+            cur.execute(sql, {"rating": search_value})
+
+        rows = cur.fetchall()
+        print_rows(rows)
+        print_rows_to_file(rows)
+        make_csv(rows, 'movie')
+        cur.close()
+
+    except Exception as err:
+        print("ERROR: ", err)
+        return False
+    
+    return True
 
 def main(args):
     #. TODO
