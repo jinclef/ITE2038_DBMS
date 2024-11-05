@@ -11,7 +11,7 @@ def display_info(search_type, search_value):
     try:
         cur = conn.cursor()
         
-        cur.execute("SET search_path to s_2020")
+        cur.execute("SET search_path to s_2021006317")
 
         if search_type == 'id' :
             sql = """
@@ -125,7 +125,7 @@ def update_customer(id, target, value) :
 
     try:
         cur = conn.cursor()
-        cur.execute("SET search_path to s_2020")
+        cur.execute("SET search_path to s_2021006317")
         cur.execute(sql, {"value": value, "id": id})
         conn.commit()
         print("Updated successfully.")
@@ -141,7 +141,7 @@ def delete_customer(id) :
 
     try:
         cur = conn.cursor()
-        cur.execute("SET search_path to s_2020")
+        cur.execute("SET search_path to s_2021006317")
         cur.execute(sql, {"id": id})
         conn.commit()
         print("Deleted successfully.")
