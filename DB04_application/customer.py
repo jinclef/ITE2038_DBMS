@@ -135,7 +135,22 @@ def update_customer(id, target, value) :
         cur.close()
 
 def delete_customer(id) :
-    # TODO
+    sql = """
+    DELETE FROM customer WHERE c_id = %(id)s;
+    """
+
+    try:
+        cur = conn.cursor()
+        cur.execute("SET search_path to s_2020")
+        cur.execute(sql, {"id": id})
+        conn.commit()
+        print("Deleted successfully.")
+    except Exception as err:
+        print(err)
+    finally:
+        cur.close()
+    
+    # end
     pass
 
 def main(args):
