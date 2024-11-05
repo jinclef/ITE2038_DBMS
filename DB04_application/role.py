@@ -15,8 +15,13 @@ def display_info(search_type, search_value, search_role):
     pass
 
 def main(args):
-    # TODO
-    pass
+    if args.command == "info":
+        if args.all:
+            display_info('all', args.all, args.role)
+        elif args.one:
+            display_info('one', args.one, args.role)
+    else :
+        print("Error: query command error.")
 
 if __name__ == "__main__":
     #
@@ -38,7 +43,8 @@ if __name__ == "__main__":
     #. TODO
     group_info.add_argument('-a', dest='all', type=str, help='display rows with top [value]') # role
     group_info.add_argument('-o', dest='one', type=str, help='display single row with m_id [value]') # movie role 띄어쓰기 인식이 되나?
-
+    group_info.add_argument('role', type=str, help='role of participant entity') # role
+    
     args = parser.parse_args()
     main(args)
     print("Running Time: ", end="")
