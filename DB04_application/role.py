@@ -23,7 +23,7 @@ def display_info(search_type, search_value, role):
             FROM participant p
             JOIN participate r ON p.p_id = r.p_id
             JOIN movie m ON r.m_id = m.m_id
-            WHERE r.role = %(role)s
+            WHERE r.role ILIKE %(role)s
             ORDER BY p.p_id
             LIMIT %(limit)s;
             """
@@ -36,7 +36,7 @@ def display_info(search_type, search_value, role):
             FROM participant p
             JOIN participate r ON p.p_id = r.p_id
             JOIN movie m ON r.m_id = m.m_id
-            WHERE m.m_id = %(id)s AND r.role = %(role)s
+            WHERE m.m_id = %(id)s AND r.role ILIKE %(role)s
             GROUP BY p.p_id, p.p_name, r.role
             ORDER BY p.p_id;
             """

@@ -45,7 +45,7 @@ def display_info(search_type, search_value):
             params = {"name": search_value}
         
         elif search_type == 'profession' :
-            condition_sql = "WHERE ocu.ocu_name = %(profession)s"
+            condition_sql = "WHERE ocu.ocu_name ILIKE %(profession)s"
             params = {"profession": search_value}
 
         elif search_type == 'all' :
