@@ -1,5 +1,6 @@
 import sys
 import csv
+from helpers.connection import conn
 
 def print_command_to_file() :
     script_name = sys.argv[0].split('/')[-1].replace('.py', '')
@@ -76,3 +77,20 @@ def is_valid_pro(pro_name):
         }
     
     return pro_name in valid_pro
+
+
+def fetch_customer_password(customer_id): # 비밀번호를 조회하는 함수
+    cur = conn.cursor()
+    cur.execute("SET search_path to s_2021006317")
+    try:
+        cur.execute("SELECT pwd FROM customer WHERE c_id = %s;", (customer_id,))
+        result = cur.fetchone()
+        print(result)
+        return result[0]
+    except Exception as err:
+        print(err)
+    finally:
+        cur.close()
+
+def verify_password(input_password, stored_password):
+    return input_password == stored_password

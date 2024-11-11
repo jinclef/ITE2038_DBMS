@@ -1,7 +1,8 @@
+import sys
 import time
 import argparse
 from helpers.connection import conn
-from helpers.utils import print_rows
+from helpers.utils import fetch_customer_password, print_rows, verify_password
 from helpers.utils import print_rows_to_file
 from helpers.utils import is_valid_genre
 from helpers.utils import print_command_to_file
@@ -115,45 +116,91 @@ def display_info(search_type, search_value):
     pass
 
 def insert_customer(id, name, email, pwd, gender, phone, genres) :
-    # TODO
-    pass
+    #. TODO
+
+    cur = conn.cursor()
+    cur.execute("SET search_path to s_2021006317")
+
+    sql = """
+    INSERT INTO customer (c_id, c_name, email, pwd, gender, phone)
+    VALUES (%(id)s, %(name)s, %(email)s, %(pwd)s, %(gender)s, %(phone)s);
+    """
+
+    try:
+        cur.execute(sql, {"id": id, "name": name, "email": email, "pwd": pwd, "gender": gender, "phone": phone})
+        conn.commit()
+
+        for genre in genres:
+            sql = """
+            INSERT INTO prefer (c_id, gr_id)
+            VALUES (%(id)s, (SELECT gr_id FROM genre WHERE gr_name = %(genre)s));
+            """
+            cur.execute(sql, {"id": id, "genre": genre})
+            conn.commit()
+        
+        display_info('id', id)
+        
+    except Exception as err:
+        conn.rollback()
+        print(err)
+
+    finally:
+        cur.close()
 
 def update_customer(id, target, value) :
     #. TODO
+    cur = conn.cursor()
+    cur.execute("SET search_path to s_2021006317")
+
+    if target == 'pwd':
+        real_pwd = fetch_customer_password(id)
+        if not verify_password(value[0], real_pwd):
+            print("Error: Password is incorrect.")
+            return
+        
+    else:
+        display_info('id', id) # before info
+
     sql = """
     UPDATE customer SET {target} = %(value)s WHERE c_id = %(id)s;
     """.format(target=target)
 
     try:
-        cur = conn.cursor()
-        cur.execute("SET search_path to s_2021006317")
         cur.execute(sql, {"value": value, "id": id})
         conn.commit()
-        print("Updated successfully.")
+
+        display_info('id', id) # changed info
+        
     except Exception as err:
+        conn.rollback()
         print(err)
+
     finally:
         cur.close()
 
 def delete_customer(id) :
     #. TODO
+    cur = conn.cursor()
+    cur.execute("SET search_path to s_2021006317")
+
+    display_info('id', id) # before info
+    
     sql = """
+    DELETE FROM prefer WHERE c_id = %(id)s;
     DELETE FROM customer WHERE c_id = %(id)s;
     """
-
+    
     try:
-        cur = conn.cursor()
-        cur.execute("SET search_path to s_2021006317")
         cur.execute(sql, {"id": id})
         conn.commit()
-        print("Deleted successfully.")
+    
     except Exception as err:
+        # rollback
+        conn.rollback()
         print(err)
+
     finally:
         cur.close()
-    
-    # end
-    pass
 
 def main(args):
     if args.command == "info":
@@ -171,14 +218,14 @@ def main(args):
 
     elif args.command == "insert":
         insert_customer(args.id, args.name, 
-            args.email, args.pwd, args.gender, args.phone, args.genres)
+            args.email, args.pwd, args.gender, args.phone, args.genre)
 
     elif args.command == "update":
         #. TODO
         if args.email:
             update_customer(args.id, "email", args.email)
-        elif args.password:
-            update_customer(args.id, "password", args.password)
+        elif args.password: # list
+            update_customer(args.id, "pwd", args.password)
         elif args.phone:
             update_customer(args.id, "phone", args.phone)
 
@@ -216,22 +263,21 @@ if __name__ == "__main__":
     #[1-2]insert
     parser_insert = subparsers.add_parser('insert', help='Insert new customer data')
     #. TODO
-    parser_insert.add_argument('-g', dest='genre', type=tuple, help='genre which customer prefer')
-    parser_insert.add_argument('c_id', type=int, help='c_id of customer entity to be inserted')
-    parser_insert.add_argument('c_name', type=str, help='c_name of customer entity to be inserted')
+    parser_insert.add_argument('-g', dest='genre', nargs='+', help='genre which customer prefers')
+    parser_insert.add_argument('id', type=int, help='c_id of customer entity to be inserted')
+    parser_insert.add_argument('name', type=str, help='c_name of customer entity to be inserted')
     parser_insert.add_argument('email', type=str, help='email of customer entity to be inserted')
     parser_insert.add_argument('pwd', type=str, help='pwd of customer entity to be inserted')
     parser_insert.add_argument('gender', type=str, help='gender of customer entity to be inserted')
-    parser_insert.add_argument('phone', type=str, help='phone of customer entity to be inserted')
-    
+    parser_insert.add_argument('phone', type=str, nargs='+', help='phone of customer entity to be inserted')
+
     #[1-3]update
     parser_update = subparsers.add_parser('update', help='Update one of customer data')
     #. TODO
-    customer_update = parser_update.add_mutually_exclusive_group(required=True) # 근데 이게 뭔데
-    customer_update.add_argument('-i', dest='id', type=int, help='c_id of customer entity')
-    customer_update.add_argument('-m', dest='email', type=str, help='c_email of customer entity')
-    customer_update.add_argument('-p', dest='password', type=str, help='c_password of customer entity')
-    customer_update.add_argument('-ph', dest='phone', type=str, help='c_phone of customer entity')
+    parser_update.add_argument('-i', dest='id', type=int, help='c_id of customer entity')
+    parser_update.add_argument('-m', dest='email', type=str, help='c_email of customer entity')
+    parser_update.add_argument('-p', dest='password', type=str, nargs='+', help='c_password of customer entity')
+    parser_update.add_argument('-ph', dest='phone', type=str, nargs='+', help='c_phone of customer entity')
 
     #[1-4]delete
     parser_delete = subparsers.add_parser('delete', help='Delete customer data with associated data')
@@ -240,6 +286,9 @@ if __name__ == "__main__":
     customer_delete.add_argument('-i', dest='id', type=int, help='c_id of customer entity')
     
     args = parser.parse_args()
+    if hasattr(args, 'phone') and args.phone:
+        args.phone = ' '.join(args.phone)
+
     main(args)
-    print("Running Time: ", end="")
-    print(time.time() - start)
+    # print("Running Time: ", end="")
+    # print(time.time() - start)
