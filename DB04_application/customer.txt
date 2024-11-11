@@ -1,6 +1,0 @@
-Command : [ customer.py info -i 176 ]
-Command : [ customer.py info -i 176 ]
-Command : [ customer.py info -i 176 ]
-Command : [ customer.py info -i 176 ]
-Command : [ customer.py info -i 176 ]
-Command : [ customer.py info -i 176 ]

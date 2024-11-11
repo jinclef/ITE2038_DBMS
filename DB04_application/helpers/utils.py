@@ -3,13 +3,13 @@ import csv
 
 def print_command_to_file() :
     script_name = sys.argv[0].split('/')[-1].replace('.py', '')
-    log_filename = f"{script_name}.txt"
+    log_filename = f"2021006317_answer/{script_name}.txt"
     with open(log_filename, 'a', encoding='utf-8') as f:
         print("Command : [", ' '.join(sys.argv), "]", file=f)
 
 def print_rows_to_file(column_names, rows):
     script_name = sys.argv[0].split('/')[-1].replace('.py', '')
-    log_filename = f"{script_name}.txt"
+    log_filename = f"2021006317_answer/{script_name}.txt"
     with open(log_filename, 'a', encoding='utf-8') as f:
     
         print(f"Total rows: {len(rows)}", file=f)
@@ -42,7 +42,7 @@ def print_rows(column_names, rows):
 def make_csv(column_names, rows):
     script_name = sys.argv[0].split('/')[-1]
     arguments = sys.argv[1:]
-    query_filename = f"{script_name}_{'_'.join(arguments)}.csv"
+    query_filename = f"2021006317_answer/{script_name}_{'_'.join(arguments)}.csv"
     query_filename = query_filename.replace('-', '_').replace(' ', '_')
 
     with open(query_filename, 'w', newline='', encoding='utf-8') as csvfile:
