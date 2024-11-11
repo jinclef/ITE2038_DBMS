@@ -192,7 +192,7 @@ def main(args):
 
 if __name__ == "__main__":
     #
-    #print_command_to_file()
+    print_command_to_file()
     #
     start = time.time()
     
