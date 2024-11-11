@@ -91,3 +91,5 @@ c_id | c_name | email           | gender | phone             | preferred_genres
 -------------------------------------------------------------------------------------
 9999 | dblab  | dblab@gmail.com | M      | +82 010-1234-5678 | Action, Drama, Romance
 
+Command : [ .\customer.py info -n dblaB ]
+Command : [ .\customer.py info -n Kelsey BeckeR ]

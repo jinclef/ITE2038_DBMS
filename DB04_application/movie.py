@@ -11,148 +11,120 @@ def display_info(search_type, search_value):
     #. TODO
     try:
         cur = conn.cursor()
-        
         cur.execute("SET search_path to s_2021006317")
 
-        if search_type == 'id' :
-            sql = """
-            SELECT 
-            m_id, 
-            m_name, 
-            m_genre, 
-            m_start_year, 
-            m_end_year, 
-            is_adult, 
-            m_rating
-            FROM movie
-            WHERE m_id = %(id)s
-            ORDER BY m_id ASC;
-            """
-            cur.execute(sql, {"id": search_value})
+        # Base query with common SELECT statement and JOINs
+        base_sql = """
+        WITH MovieComments(movie_id, comment_count, comment_sum) AS (
+            SELECT m.m_id, 
+                COALESCE(COUNT(ct.m_id), 0) AS comment_count, 
+                COALESCE(SUM(ct.rating), 0) AS comment_sum
+            FROM movie AS m 
+            LEFT OUTER JOIN comment_to AS ct ON ct.m_id = m.m_id
+            GROUP BY m.m_id
+        )
+        SELECT 
+            m.m_id, 
+            m.m_name, 
+            m.m_type, 
+            m.start_year, 
+            m.end_year,
+            m.is_adult,
+            m.runtimes,
+            m.m_rating AS imdb_rating,
+            ((m.m_rating * m.votes + COALESCE(mct.comment_sum, 0)) / 
+            (m.votes + COALESCE(mct.comment_count, 0))) AS final_rating,
+            STRING_AGG(DISTINCT gr.gr_name, ', ') AS genres
+        FROM movie AS m
+        LEFT OUTER JOIN MovieComments AS mct ON mct.movie_id = m.m_id
+        JOIN classify AS cl ON m.m_id = cl.m_id
+        JOIN genre AS gr ON cl.gr_id = gr.gr_id
+        """
 
-        elif search_type == 'name' :
-            sql = """
-            SELECT
-            m_id, 
-            m_name, 
-            m_genre, 
-            m_start_year, 
-            m_end_year, 
-            is_adult, 
-            m_rating
-            FROM movie
-            WHERE m_name ILIKE %(name)s
-            ORDER BY m_id ASC;
-            """
-            cur.execute(sql, {"name": search_value})
+        # Add conditions based on search_type
+        condition_sql = ""
+        params = {}
+        if search_type == 'id':
+            condition_sql = "WHERE m.m_id = %(id)s"
+            params = {"id": search_value}
 
-        elif search_type == 'genre' :
-            sql = """
-            SELECT 
-                m_id, 
-                m_name, 
-                m_genre, 
-                m_start_year, 
-                m_end_year, 
-                is_adult, 
-                m_rating
-            FROM movie
-            WHERE m_genre ILIKE %(genre)s
-            ORDER BY m_id ASC;
-            """
-            cur.execute(sql, {"genre": search_value})
+        elif search_type == 'name':
+            condition_sql = "WHERE m.m_name ILIKE %(name)s"
+            params = {"name": search_value}
 
-        elif search_type == 'all' :
-            sql = """
-            SELECT 
-                m_id, 
-                m_name, 
-                m_genre, 
-                m_start_year, 
-                m_end_year, 
-                is_adult, 
-                m_rating
-            FROM movie
-            ORDER BY m_id ASC
-            LIMIT %(all)s;
+        elif search_type == 'type':
+            condition_sql = "WHERE m.m_type ILIKE %(type)s"
+            params = {"type": search_value}
+        
+        elif search_type == 'genre':
+            condition_sql = """
+            WHERE m.m_id IN (
+                SELECT m.m_id
+                FROM movie m
+                JOIN classify cl ON m.m_id = cl.m_id
+                JOIN genre gr ON cl.gr_id = gr.gr_id
+                WHERE gr.gr_name ILIKE %(genre)s
+            )
             """
-            cur.execute(sql, {"all": search_value})
+            params = {"genre": search_value}
+        
+        elif search_type == 'all':
+            condition_sql = ""
+            limit_sql = "LIMIT %(all)s"
+            params = {"all": search_value}
+        
+        elif search_type == 'start_year':
+            condition_sql = "WHERE EXTRACT(YEAR FROM m.start_year) >= %(start_year)s"
+            params = {"start_year": search_value}
 
-        elif search_type == 'start_year' :
-            sql = """
-            SELECT 
-                m_id, 
-                m_name, 
-                m_genre, 
-                m_start_year, 
-                m_end_year, 
-                is_adult, 
-                m_rating
-            FROM movie
-            WHERE m_start_year = %(start_year)s
-            ORDER BY m_id ASC;
-            """
-            cur.execute(sql, {"start_year": search_value})
+        elif search_type == 'end_year':
+            condition_sql = "WHERE EXTRACT(YEAR FROM m.end_year) >= %(end_year)s"
+            params = {"end_year": search_value}
 
-        elif search_type == 'end_year' :
-            sql = """
-            SELECT 
-                m_id, 
-                m_name, 
-                m_genre, 
-                m_start_year, 
-                m_end_year,
-                is_adult,
-                m_rating
-            FROM movie
-            WHERE m_end_year = %(end_year)s
-            ORDER BY m_id ASC;
-            """
-            cur.execute(sql, {"end_year": search_value})
+        
+        elif search_type == 'is_adult':
+            condition_sql = "WHERE m.is_adult = %(is_adult)s"
+            params = {"is_adult": search_value}
+        
+        elif search_type == 'rating':
+            condition_sql = "WHERE m.m_rating >= %(rating)s"
+            params = {"rating": search_value}
 
-        elif search_type == 'is_adult' :
-            sql = """
-            SELECT 
-                m_id, 
-                m_name, 
-                m_genre, 
-                m_start_year, 
-                m_end_year,
-                is_adult,
-                m_rating
-            FROM movie
-            WHERE is_adult = %(is_adult)s
-            ORDER BY m_id ASC;
-            """
-            cur.execute(sql, {"is_adult": search_value})
+        # Final SQL with GROUP BY and ORDER BY clauses
+        final_sql = f"""
+        {base_sql}
+        {condition_sql}
+        GROUP BY m.m_id, m.m_name, m.m_type, m.start_year, m.end_year, 
+                 m.is_adult, m.runtimes, m.m_rating, m.votes, mct.comment_sum, mct.comment_count
+        ORDER BY m.m_id ASC
+        """
+        
+        if search_type == 'all':
+            final_sql += f" {limit_sql}"
+        
+        final_sql += ";"
 
-        elif search_type == 'rating' :
-            sql = """
-            SELECT 
-                m_id, 
-                m_name, 
-                m_genre, 
-                m_start_year, 
-                m_end_year,
-                is_adult,
-                m_rating
-            FROM movie
-            WHERE m_rating = %(rating)s
-            ORDER BY m_id ASC;
-            """
-            cur.execute(sql, {"rating": search_value})
+        # Execute the final SQL
+        cur.execute(final_sql, params)
 
+        # Fetch results and display or save them
         rows = cur.fetchall()
-        print_rows(rows)
-        print_rows_to_file(rows)
-        make_csv(rows, 'movie')
-        cur.close()
+        if not rows:
+            print("No results found.")
+            return False
+        else:
+            column_names = [desc[0] for desc in cur.description]
+            print_rows_to_file(column_names, rows)
+            make_csv(column_names, rows)
+            print_rows(column_names, rows)
+            return True
 
     except Exception as err:
         print("ERROR: ", err)
         return False
-    
+
     return True
+
 
 def main(args):
     #. TODO
@@ -163,6 +135,8 @@ def main(args):
             display_info('id', args.id)
         elif args.name:
             display_info('name', args.name)
+        elif args.type:
+            display_info('type', args.type)
         elif args.genre:
             display_info('genre', args.genre)
         elif args.start_year:
@@ -178,7 +152,7 @@ def main(args):
 
 if __name__ == "__main__":
     #
-    #print_command_to_file()
+    print_command_to_file()
     #
     start = time.time()
     parser = argparse.ArgumentParser(description = """
@@ -198,12 +172,12 @@ if __name__ == "__main__":
     group_info.add_argument('-a', dest='all', type=str, help='display rows with top [value]')
     group_info.add_argument('-i', dest='id', type=int, help='m_id of movie entity')
     group_info.add_argument('-n', dest='name', type=str, help='m_name of movie entity')
+    group_info.add_argument('-t', dest='type', type=str, help='m_type of movie entity')
     group_info.add_argument('-g', dest='genre', type=str, help='genre which movie classified')
-
-    group_info.add_argument('-sy', dest='start_year', type=str, help='start_year of movie entity')
-    group_info.add_argument('-ey', dest='end_year', type=str, help='end_year of movie entity')
+    group_info.add_argument('-sy', dest='start_year', type=int, help='start_year of movie entity')
+    group_info.add_argument('-ey', dest='end_year', type=int, help='end_year of movie entity')
     group_info.add_argument('-ad', dest='is_adult', type=bool, help='is_adult of movie entity')
-    group_info.add_argument('-r', dest='rating', type=int, help='m_rating of movie entity')
+    group_info.add_argument('-r', dest='rating', type=float, help='m_rating of movie entity')
     
     args = parser.parse_args()
     main(args)
