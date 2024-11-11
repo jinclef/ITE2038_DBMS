@@ -1,5 +1,6 @@
 Command : [ .\customer.py info -i 176 ]
-Command : [ .\customer.py info -i 176 ]
-Command : [ .\customer.py info -i 176 ]
-Command : [ .\customer.py info -i 176 ]
-Command : [ .\customer.py info -i 176 ]
+Total rows: 1
+c_id | c_name        | email             | gender | phone           | preferred_genres           
+-------------------------------------------------------------------------------------------------
+176  | Kelsey Becker | q7Tf479@yahoo.com | F      | +1 679-685-7236 | Animation, Mystery, Romance
+
