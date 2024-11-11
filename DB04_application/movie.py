@@ -89,6 +89,10 @@ def display_info(search_type, search_value):
         elif search_type == 'rating':
             condition_sql = "WHERE m.m_rating >= %(rating)s"
             params = {"rating": search_value}
+        
+        else:
+            print("can't search by", search_type)
+            return False
 
         # Final SQL with GROUP BY and ORDER BY clauses
         final_sql = f"""
@@ -122,9 +126,9 @@ def display_info(search_type, search_value):
     except Exception as err:
         print("ERROR: ", err)
         return False
-
-    return True
-
+    
+    finally:
+        cur.close()
 
 def main(args):
     #. TODO

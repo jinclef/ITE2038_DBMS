@@ -8,9 +8,90 @@ from helpers.utils import print_command_to_file
 from helpers.utils import make_csv
 from helpers.utils import is_valid_pro
 
+'''
+ p_id, p_name, major_work, ocu_name(profession) 모두 출력
+• 단, ocu_name(profession) 은 모두 “,” 로 연결해서출력할것
+• 예시참조
+• p_id기준오름차순정렬
+
+table occupation: ocu_id, ocu_name
+table participant: p_id, p_name, major_work
+table profession: p_id, ocu_id
+'''
+
 def display_info(search_type, search_value):
-    # TODO
-    pass
+    try:
+        cur = conn.cursor()
+        
+        cur.execute("SET search_path to s_2021006317")
+
+        base_sql = """
+        SELECT pa.p_id, pa.p_name, pa.major_work, string_agg(ocu_name, ', ') as profession
+        FROM participant pa
+        JOIN profession pr ON pa.p_id = pr.p_id
+        JOIN occupation ocu ON pr.ocu_id = ocu.ocu_id
+        """
+        
+        # Add conditions based on search_type
+        condition_sql = ""
+        params = {}
+
+        if search_type == 'id' :
+            condition_sql = "WHERE pr.p_id = %(id)s"
+            params = {"id": search_value}
+
+        elif search_type == 'name' :
+            condition_sql = "WHERE pa.p_name ILIKE %(name)s"
+            params = {"name": search_value}
+        
+        elif search_type == 'profession' :
+            condition_sql = "WHERE ocu.ocu_name = %(profession)s"
+            params = {"profession": search_value}
+
+        elif search_type == 'all' :
+            condition_sql = ""
+            limit_sql = "LIMIT %(all)s"
+            params = {"all": search_value}
+
+        else :
+            print("can't search by", search_type)
+            return False
+
+        # Final SQL with GROUP BY and ORDER BY clauses
+        final_sql = f"""
+        {base_sql}
+        {condition_sql}
+        GROUP BY pa.p_id, pa.p_name, pa.major_work
+        ORDER BY pa.p_id ASC
+        """
+        
+        if search_type == 'all':
+            final_sql += f" {limit_sql}"
+        
+        final_sql += ";"
+
+        # Execute the final SQL
+        cur.execute(final_sql, params)
+
+        # Fetch results and display or save them
+        rows = cur.fetchall()
+        if not rows:
+            print("No results found.")
+            return False
+        else:
+            column_names = [desc[0] for desc in cur.description]
+            print_rows_to_file(column_names, rows)
+            make_csv(column_names, rows)
+            print_rows(column_names, rows)
+            return True
+
+    except Exception as err:
+        print("ERROR: ", err)
+        return False
+    
+    finally:
+        cur.close()
+
 
 def main(args):
     if args.command == "info":
@@ -32,7 +113,7 @@ def main(args):
 
 if __name__ == "__main__":
     #
-    #print_command_to_file()
+    print_command_to_file()
     #
     start = time.time()
     parser = argparse.ArgumentParser(description = """

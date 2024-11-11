@@ -112,8 +112,6 @@ def display_info(search_type, search_value):
     
     finally:
         cur.close()
-    # end
-    pass
 
 def insert_customer(id, name, email, pwd, gender, phone, genres) :
     #. TODO
