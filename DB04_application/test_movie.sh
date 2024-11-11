@@ -1,3 +1,5 @@
+#!/bin/bash
+
 python .\movie.py info -a 5
 python .\movie.py info -i 71002
 python .\movie.py info -n "the hathaways"
