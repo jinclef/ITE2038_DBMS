@@ -57,8 +57,8 @@ def display_info(search_type, search_value, role):
             return False
         else:
             column_names = [desc[0] for desc in cur.description]
-            print_rows_to_file(column_names, rows)
-            make_csv(column_names, rows)
+            # print_rows_to_file(column_names, rows)
+            # make_csv(column_names, rows)
             print_rows(column_names, rows)
             return True
 
@@ -84,7 +84,7 @@ def main(args):
 
 if __name__ == "__main__":
     #
-    print_command_to_file()
+    # print_command_to_file()
     #
     start = time.time()
     parser = argparse.ArgumentParser(description = """

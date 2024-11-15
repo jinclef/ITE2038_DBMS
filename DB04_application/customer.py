@@ -101,8 +101,8 @@ def display_info(search_type, search_value):
         else:
             column_names = [desc[0] for desc in cur.description]
             #
-            print_rows_to_file(column_names, rows)
-            make_csv(column_names, rows)
+            # print_rows_to_file(column_names, rows)
+            # make_csv(column_names, rows)
             #
             print_rows(column_names, rows)
             return True
@@ -270,7 +270,7 @@ def main(args):
 
 if __name__ == "__main__":
     #
-    print_command_to_file()
+    # print_command_to_file()
     #
     start = time.time()
     
@@ -322,5 +322,5 @@ if __name__ == "__main__":
         args.phone = ' '.join(args.phone)
 
     main(args)
-    # print("Running Time: ", end="")
-    # print(time.time() - start)
+    print("Running Time: ", end="")
+    print(time.time() - start)
