@@ -165,10 +165,6 @@ def update_customer(id, target, value) :
 
     try:
         if (target == 'preferred_genres'):
-            # if value.count < 3 return
-            if len(value) != 3:
-                print("Error: You must enter exactly three genres.")
-                return
             
             sql = """
             DELETE FROM prefer WHERE c_id = %(id)s;
@@ -177,10 +173,6 @@ def update_customer(id, target, value) :
             conn.commit()
 
             for genre in value:
-                if not is_valid_genre(genre):
-                    print(f"Error: '{genre}' is not a valid genre.")
-                    return
-
                 sql = """
                 INSERT INTO prefer (c_id, gr_id)
                 VALUES (%(id)s, (SELECT gr_id FROM genre WHERE gr_name ILIKE %(genre)s));
@@ -240,6 +232,7 @@ def main(args):
         elif args.genre:
             if not is_valid_genre(args.genre):
                 print(f"Error: '{args.genre}' is not a valid genre.")
+                return
             else:
                 display_info('genre', args.genre)
         elif args.all:
@@ -258,6 +251,14 @@ def main(args):
         elif args.phone:
             update_customer(args.id, "phone", args.phone)
         elif args.genres:
+            # if count < 3 return
+            if len(args.genres) != 3:
+                print("Error: You must enter exactly three genres.")
+                return
+            for genre in args.genres:
+                if not is_valid_genre(genre):
+                    print(f"Error: '{genre}' is not a valid genre.")
+                    return
             update_customer(args.id, "preferred_genres", args.genres)
 
     elif args.command == "delete":
