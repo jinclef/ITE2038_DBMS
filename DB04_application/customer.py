@@ -108,6 +108,7 @@ def display_info(search_type, search_value):
             return True
 
     except Exception as err:
+        print("Unexpected Exception Occurred.")
         print(err)
     
     finally:
@@ -140,6 +141,7 @@ def insert_customer(id, name, email, pwd, gender, phone, genres) :
         
     except Exception as err:
         conn.rollback()
+        print("Unexpected Exception Occurred.")
         print(err)
 
     finally:
@@ -151,6 +153,8 @@ def update_customer(id, target, value) :
     cur.execute("SET search_path to s_2021006317")
 
     if target == 'pwd':
+        # value[0] : old password
+        # value[1] : new password
         real_pwd = fetch_customer_password(id)
         if not verify_password(value[0], real_pwd):
             print("Error: Password is incorrect.")
@@ -159,18 +163,39 @@ def update_customer(id, target, value) :
     else:
         display_info('id', id) # before info
 
-    sql = """
-    UPDATE customer SET {target} = %(value)s WHERE c_id = %(id)s;
-    """.format(target=target)
-
     try:
-        cur.execute(sql, {"value": value, "id": id})
-        conn.commit()
+        if (target == 'preferred_genres'):
+            sql = """
+            DELETE FROM prefer WHERE c_id = %(id)s;
+            """
+            cur.execute(sql, {"id": id})
+            conn.commit()
+
+            for genre in value:
+                if not is_valid_genre(genre):
+                    print(f"Error: '{genre}' is not a valid genre.")
+                    return
+
+                sql = """
+                INSERT INTO prefer (c_id, gr_id)
+                VALUES (%(id)s, (SELECT gr_id FROM genre WHERE gr_name ILIKE %(genre)s));
+                """
+                cur.execute(sql, {"id": id, "genre": genre})
+                conn.commit()
+
+        else:
+            sql = """
+            UPDATE customer SET {target} = %(value)s WHERE c_id = %(id)s;
+            """.format(target=target)
+          
+            cur.execute(sql, {"value": value[1], "id": id})
+            conn.commit()
 
         display_info('id', id) # changed info
         
     except Exception as err:
         conn.rollback()
+        print("Unexpected Exception Occurred.")
         print(err)
 
     finally:
@@ -195,6 +220,7 @@ def delete_customer(id) :
     except Exception as err:
         # rollback
         conn.rollback()
+        print("Unexpected Exception Occurred.")
         print(err)
 
     finally:
@@ -226,6 +252,8 @@ def main(args):
             update_customer(args.id, "pwd", args.password)
         elif args.phone:
             update_customer(args.id, "phone", args.phone)
+        elif args.genres:
+            update_customer(args.id, "preferred_genres", args.genres)
 
     elif args.command == "delete":
         #. TODO
@@ -276,6 +304,7 @@ if __name__ == "__main__":
     parser_update.add_argument('-m', dest='email', type=str, help='c_email of customer entity')
     parser_update.add_argument('-p', dest='password', type=str, nargs='+', help='c_password of customer entity')
     parser_update.add_argument('-ph', dest='phone', type=str, nargs='+', help='c_phone of customer entity')
+    parser_update.add_argument('-gs', dest='genres', type=str, nargs='+', help='three genres which customer prefers')
 
     #[1-4]delete
     parser_delete = subparsers.add_parser('delete', help='Delete customer data with associated data')

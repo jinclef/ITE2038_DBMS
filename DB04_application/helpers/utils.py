@@ -60,7 +60,8 @@ def is_valid_genre(genre):
         "Musical", "Thriller", "History"
     }
     
-    return genre in valid_genres
+    # 대소문자 구분 없이 비교
+    return genre.lower() in set(map(str.lower, valid_genres))
 
     
 def is_valid_pro(pro_name):
@@ -85,7 +86,6 @@ def fetch_customer_password(customer_id): # 비밀번호를 조회하는 함수
     try:
         cur.execute("SELECT pwd FROM customer WHERE c_id = %s;", (customer_id,))
         result = cur.fetchone()
-        print(result)
         return result[0]
     except Exception as err:
         print(err)
