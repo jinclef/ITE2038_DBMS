@@ -1,7 +1,7 @@
 import time
 import argparse
 from helpers.connection import conn
-from helpers.utils import print_rows
+from helpers.utils import is_valid_pro, print_rows
 from helpers.utils import print_rows_to_file
 from helpers.utils import print_command_to_file
 from helpers.utils import make_csv
@@ -72,6 +72,9 @@ def display_info(search_type, search_value, role):
 
 def main(args):
     if args.command == "info":
+        if not is_valid_pro(args.role):
+            print(f"Error: '{args.role}' is not a valid profession.")
+            return
         if args.all: # -a
             display_info('all', args.all, args.role)
         elif args.one: # -i
