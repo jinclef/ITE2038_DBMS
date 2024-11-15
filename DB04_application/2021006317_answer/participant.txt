@@ -491,3 +491,14 @@ p_id     | p_name                          | major_work | profession
 14490628 | Bartlomiej Deklewa              | 26423839   | actor     
 14829616 | Jan Salasinski                  | 27688981   | actor     
 
+Command : [ .\participant.py info -a 5 ]
+Total rows: 5
+p_id | p_name         | major_work | profession                
+---------------------------------------------------------------
+53   | Robert Mitchum | 0039689    | actor, producer, writer   
+92   | John Cleese    | 0095159    | actor, producer, writer   
+100  | Rowan Atkinson | 0274166    | actor, producer, writer   
+228  | Kevin Spacey   | 0119488    | actor, producer, writer   
+231  | Oliver Stone   | 0091763    | director, producer, writer
+
+Command : [ .\participant.py info -pr act ]
