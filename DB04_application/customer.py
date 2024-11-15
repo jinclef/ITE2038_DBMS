@@ -165,6 +165,11 @@ def update_customer(id, target, value) :
 
     try:
         if (target == 'preferred_genres'):
+            # if value.count < 3 return
+            if len(value) != 3:
+                print("Error: You must enter exactly three genres.")
+                return
+            
             sql = """
             DELETE FROM prefer WHERE c_id = %(id)s;
             """
