@@ -152,6 +152,9 @@ def update_customer(id, target, value) :
     cur = conn.cursor()
     cur.execute("SET search_path to s_2021006317")
 
+    
+    display_info('id', id) # before info
+    
     if target == 'pwd':
         # value[0] : old password
         # value[1] : new password
@@ -160,9 +163,6 @@ def update_customer(id, target, value) :
             print("Error: Password is incorrect.")
             return
         
-    else:
-        display_info('id', id) # before info
-
     try:
         if (target == 'preferred_genres'):
             
