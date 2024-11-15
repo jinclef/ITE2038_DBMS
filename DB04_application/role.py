@@ -19,11 +19,12 @@ def display_info(search_type, search_value, role):
 
         if search_type == 'all':
             sql = """
-            SELECT p.p_id, p.p_name, r.role, m.m_name, r.casting
+            SELECT p.p_id, p.p_name, r.role, m.m_name, STRING_AGG(r.casting, ', ') AS casting
             FROM participant p
             JOIN participate r ON p.p_id = r.p_id
             JOIN movie m ON r.m_id = m.m_id
             WHERE r.role ILIKE %(role)s
+            GROUP BY p.p_id, p.p_name, r.role, m.m_name
             ORDER BY p.p_id
             LIMIT %(limit)s;
             """
@@ -71,9 +72,9 @@ def display_info(search_type, search_value, role):
 
 def main(args):
     if args.command == "info":
-        if args.all:
+        if args.all: # -a
             display_info('all', args.all, args.role)
-        elif args.one:
+        elif args.one: # -i
             display_info('one', args.one, args.role)
     else :
         print("Error: query command error.")
@@ -85,7 +86,7 @@ if __name__ == "__main__":
     start = time.time()
     parser = argparse.ArgumentParser(description = """
     how to use
-    1. info [-a(all) / -o(one)] value role
+    1. info [-a(all) / -i(one)] value role
     2. ...
     3. ...
     """, formatter_class=argparse.RawTextHelpFormatter)
