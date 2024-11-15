@@ -233,8 +233,7 @@ def main(args):
             if not is_valid_genre(args.genre):
                 print(f"Error: '{args.genre}' is not a valid genre.")
                 return
-            else:
-                display_info('genre', args.genre)
+            display_info('genre', args.genre)
         elif args.all:
             display_info('all', args.all)
 
