@@ -142,6 +142,9 @@ def main(args):
         elif args.type:
             display_info('type', args.type)
         elif args.genre:
+            if not is_valid_genre(args.genre):
+                print(f"Error: '{args.genre}' is not a valid genre.")
+                return
             display_info('genre', args.genre)
         elif args.start_year:
             display_info('start_year', args.start_year)
