@@ -104,8 +104,8 @@ def main(args):
         elif args.profession:
             if not is_valid_pro(args.profession) :
                 print(f"Error: {args.profession} is not valid profession.")
-            else :
-                display_info('profession', args.profession)
+                return
+            display_info('profession', args.profession)
     
     else :
         print("Error: query command error.")

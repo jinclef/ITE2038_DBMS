@@ -77,7 +77,7 @@ def is_valid_pro(pro_name):
         "talent_agent", "transportation_department", "visual_effects", "writer"
         }
     
-    return pro_name in valid_pro
+    return pro_name.lower() in set(map(str.lower, valid_pro))
 
 
 def fetch_customer_password(customer_id): # 비밀번호를 조회하는 함수
